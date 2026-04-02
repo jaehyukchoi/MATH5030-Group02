@@ -238,8 +238,6 @@ repo/
 ├── CONTRIBUTING.md
 ├── pyproject.toml
 ├── requirements.txt
-├── docs/
-│   └── PROJECT_SCOPE.md
 ├── src/
 │   └── heston_mc/
 │       ├── __init__.py
