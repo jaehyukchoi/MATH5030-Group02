@@ -68,7 +68,7 @@ where:
 
 ## Key modeling note
 
-Following the professor’s guidance, this project uses **simple returns**, not log returns, when computing realized variance.
+This project uses **simple returns**, not log returns, when computing realized variance.
 
 For time grid points $(t_0, t_1, \dots, t_N)$, the simple return is defined as:
 
