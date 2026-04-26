@@ -1,27 +1,41 @@
 name: Publish to PyPI
+
 on:
   release:
-    types: [published]     # fires when you publish a GitHub Release
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
-      - run: pip install build
+        with:
+          python-version: "3.12"
+
+      - run: pip install --upgrade build
       - run: python -m build
+
       - uses: actions/upload-artifact@v4
-        with: { name: dist, path: dist/ }
+        with:
+          name: dist
+          path: dist/
 
   publish:
     needs: build
     runs-on: ubuntu-latest
-    environment: pypi               # must match the environment name on PyPI
+    environment: pypi
     permissions:
-      id-token: write               # enables Trusted Publisher (no token needed)
+      id-token: write
+
     steps:
       - uses: actions/download-artifact@v4
-        with: { name: dist, path: dist/ }
+        with:
+          name: dist
+          path: dist/
+
+      - run: pip install twine
+      - run: twine check dist/*
+
       - uses: pypa/gh-action-pypi-publish@release/v1
