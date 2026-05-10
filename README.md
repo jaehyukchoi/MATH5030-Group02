@@ -137,6 +137,9 @@ Broadie, M., & Jain, A. (2008). Pricing and Hedging Volatility Derivatives. The 
 
 Fouque, J.-P., & Han, C.-H. (2004). Variance reduction for Monte Carlo methods to evaluate option prices under multi-factor stochastic volatility models. Quantitative Finance, 4(5), 597–606. https://doi.org/10.1080/14697680400020317
 
+## Publishing a Python Package to PyPI
+https://pypi.org/project/heston-mc-variance-project/
+
 ## License
 
 MIT
