@@ -3,7 +3,7 @@
 ## Module ownership
 
 - Yixin Feng: repository structure, params, utils, interfaces, README setup
-- Ha Pham: Heston simulation engine
+- Ha Pham: Heston simulation engine, publishing the package to PyPI 
 - Yingyue Lai: realized variance and variance swap pricing
 - Jiani Han: variance option pricing
 - Lin Tian: control variate module
