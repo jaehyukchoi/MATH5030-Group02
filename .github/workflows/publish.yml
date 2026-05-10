@@ -46,6 +46,8 @@ jobs:
           name: dist
           path: dist/
 
+      - run: pip install twine==5.1.1
+
       - run: twine check dist/*
 
       - uses: pypa/gh-action-pypi-publish@release/v1
