@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools==77.0.3",
+    "setuptools==69.5.1",
     "wheel",
     "build"
 ]
@@ -12,7 +12,12 @@ version = "0.1.0"
 description = "Monte Carlo pricing of variance derivatives under the Heston model"
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
+
+authors = [
+    { name = "Ha Pham" }
+]
+
+license = { text = "MIT" }
 
 dependencies = [
     "numpy>=1.24",
