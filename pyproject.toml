@@ -8,13 +8,15 @@ version = "0.1.0"
 description = "Monte Carlo pricing of variance derivatives under the Heston model"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE.md" }
+license = "MIT"
+
 dependencies = [
     "numpy>=1.24",
     "scipy>=1.10",
     "pandas>=2.0",
     "matplotlib>=3.7"
 ]
+
 [project.optional-dependencies]
 test = ["pytest"]
 
@@ -23,5 +25,3 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-
