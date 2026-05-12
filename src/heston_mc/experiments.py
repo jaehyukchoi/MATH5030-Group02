@@ -8,7 +8,11 @@ import matplotlib.pyplot as plt
 from .params import default_heston_params, default_mc_config
 from .simulation import HestonModelSimulator
 from .interfaces import SimulationResult
-from .control_variate import compare_variance_swap_methods, price_variance_option_control_variate
+from .control_variate import (
+    compare_variance_swap_methods, 
+    price_variance_option_control_variate,
+    estimate_variance_option_beta_from_pilot  # 新增导入 Pilot 函数
+)
 from .variance_option import price_variance_option
 
 
@@ -34,7 +38,7 @@ def run_baseline_experiment():
     dt = config.maturity / config.n_steps
     sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
 
-    # Variance Swap
+    # Variance Swap (Analytic Beta = 1.0 is handled internally)
     swap_results = compare_variance_swap_methods(
         sim_result=sim_result,
         strike=strike_variance,
@@ -47,6 +51,17 @@ def run_baseline_experiment():
     print(f"  Plain MC: {swap_results['plain_price']:.6f} (SE: {swap_results['plain_std_error']:.6f})")
     print(f"  CV MC:    {swap_results['control_variate_price']:.6f} (SE: {swap_results['control_variate_std_error']:.6f})")
     print(f"  Ratio:    {swap_results['std_error_improvement_ratio']:.2f}x")
+
+    # --- NEW: Pilot Run for Variance Option Beta ---
+    print("\nEstimating optimal beta for Variance Option from independent pilot sample...")
+    beta_opt = estimate_variance_option_beta_from_pilot(
+        params=params,
+        config=config,
+        strike=strike_variance,
+        rate=params.r,
+        maturity=config.maturity
+    )
+    print(f"Estimated Optimal Beta: {beta_opt:.4f}")
 
     # Variance Option
     plain_opt_res = price_variance_option(
@@ -61,7 +76,8 @@ def run_baseline_experiment():
         strike=strike_variance,
         rate=params.r,
         maturity=config.maturity,
-        params=params
+        params=params,
+        beta=beta_opt  # NEW: Pass the estimated beta
     )
 
     opt_improvement_ratio = plain_opt_res.std_error / cv_opt_res.std_error
@@ -90,12 +106,18 @@ def run_path_sensitivity_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
+        # --- NEW: Pilot Run ---
+        beta_opt = estimate_variance_option_beta_from_pilot(
+            params=params, config=config, strike=strike, rate=params.r, maturity=config.maturity
+        )
+        
         plain_res = price_variance_option(
             sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity
         )
         
         cv_res = price_variance_option_control_variate(
-            sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity, params=params
+            sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity, 
+            params=params, beta=beta_opt
         )
         
         results_data.append({
@@ -146,12 +168,18 @@ def run_timestep_sensitivity_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
+        # --- NEW: Pilot Run (Requires re-estimation as dt changes) ---
+        beta_opt = estimate_variance_option_beta_from_pilot(
+            params=params, config=config, strike=strike, rate=params.r, maturity=config.maturity
+        )
+        
         plain_res = price_variance_option(
             sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity
         )
         
         cv_res = price_variance_option_control_variate(
-            sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity, params=params
+            sim_result=sim_result, strike=strike, rate=params.r, maturity=config.maturity, 
+            params=params, beta=beta_opt
         )
         
         results_data.append({
@@ -215,12 +243,18 @@ def run_parameter_robustness_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
+        # --- NEW: Pilot Run (Requires re-estimation as params change drastically) ---
+        beta_opt = estimate_variance_option_beta_from_pilot(
+            params=params, config=current_config, strike=strike, rate=params.r, maturity=current_config.maturity
+        )
+        
         plain_res = price_variance_option(
             sim_result=sim_result, strike=strike, rate=params.r, maturity=current_config.maturity
         )
         
         cv_res = price_variance_option_control_variate(
-            sim_result=sim_result, strike=strike, rate=params.r, maturity=current_config.maturity, params=params
+            sim_result=sim_result, strike=strike, rate=params.r, maturity=current_config.maturity, 
+            params=params, beta=beta_opt
         )
         
         reduction_ratio = plain_res.std_error / cv_res.std_error
