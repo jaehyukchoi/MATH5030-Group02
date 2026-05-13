@@ -36,5 +36,5 @@ def discount(value: np.ndarray | float, rate: float, maturity: float):
 
 def standard_error(samples: np.ndarray) -> float:
     if samples.size < 2:
-        return 0.0
+        return float('nan') 
     return float(samples.std(ddof=1) / np.sqrt(samples.size))
