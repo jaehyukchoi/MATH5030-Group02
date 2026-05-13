@@ -4,14 +4,14 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Relative imports from sibling modules within the package
+
 from .params import default_heston_params, default_mc_config
 from .simulation import HestonModelSimulator
 from .interfaces import SimulationResult
 from .control_variate import (
     compare_variance_swap_methods, 
     price_variance_option_control_variate,
-    estimate_variance_option_beta_from_pilot  # 新增导入 Pilot 函数
+    estimate_variance_option_beta_from_pilot 
 )
 from .variance_option import price_variance_option
 
@@ -38,7 +38,7 @@ def run_baseline_experiment():
     dt = config.maturity / config.n_steps
     sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
 
-    # Variance Swap (Analytic Beta = 1.0 is handled internally)
+    
     swap_results = compare_variance_swap_methods(
         sim_result=sim_result,
         strike=strike_variance,
@@ -49,10 +49,9 @@ def run_baseline_experiment():
     
     print("Variance Swap:")
     print(f"  Plain MC: {swap_results['plain_price']:.6f} (SE: {swap_results['plain_std_error']:.6f})")
-    print(f"  CV MC:    {swap_results['control_variate_price']:.6f} (SE: {swap_results['control_variate_std_error']:.6f})")
-    print(f"  Ratio:    {swap_results['std_error_improvement_ratio']:.2f}x")
+    print(f"  CV MC: {swap_results['control_variate_price']:.6f} (SE: {swap_results['control_variate_std_error']:.6f})")
+    print(f"  Ratio: {swap_results['std_error_improvement_ratio']:.2f}x")
 
-    # --- NEW: Pilot Run for Variance Option Beta ---
     print("\nEstimating optimal beta for Variance Option from independent pilot sample...")
     beta_opt = estimate_variance_option_beta_from_pilot(
         params=params,
@@ -77,7 +76,7 @@ def run_baseline_experiment():
         rate=params.r,
         maturity=config.maturity,
         params=params,
-        beta=beta_opt  # NEW: Pass the estimated beta
+        beta=beta_opt  
     )
 
     opt_improvement_ratio = plain_opt_res.std_error / cv_opt_res.std_error
@@ -106,7 +105,7 @@ def run_path_sensitivity_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
-        # --- NEW: Pilot Run ---
+       
         beta_opt = estimate_variance_option_beta_from_pilot(
             params=params, config=config, strike=strike, rate=params.r, maturity=config.maturity
         )
@@ -168,7 +167,7 @@ def run_timestep_sensitivity_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
-        # --- NEW: Pilot Run (Requires re-estimation as dt changes) ---
+        
         beta_opt = estimate_variance_option_beta_from_pilot(
             params=params, config=config, strike=strike, rate=params.r, maturity=config.maturity
         )
@@ -217,12 +216,10 @@ def run_parameter_robustness_experiment():
     config = default_mc_config()
     config.n_paths = 20000
     
-    scenarios = [
-        {"name": "Baseline", "sigma": 0.50, "rho": -0.70, "maturity": 1.0},
+    scenarios = [{"name": "Baseline", "sigma": 0.50, "rho": -0.70, "maturity": 1.0},
         {"name": "High Vol of Vol", "sigma": 0.90, "rho": -0.70, "maturity": 1.0},
         {"name": "Strong Neg Correlation", "sigma": 0.50, "rho": -0.95, "maturity": 1.0},
-        {"name": "Longer Maturity", "sigma": 0.50, "rho": -0.70, "maturity": 3.0}
-    ]
+        {"name": "Longer Maturity", "sigma": 0.50, "rho": -0.70, "maturity": 3.0}]
 
     results_data = []
 
@@ -243,7 +240,7 @@ def run_parameter_robustness_experiment():
         S, v = simulator.simulate()
         sim_result = SimulationResult(stock_paths=S, variance_paths=v, dt=dt)
         
-        # --- NEW: Pilot Run (Requires re-estimation as params change drastically) ---
+        
         beta_opt = estimate_variance_option_beta_from_pilot(
             params=params, config=current_config, strike=strike, rate=params.r, maturity=current_config.maturity
         )
