@@ -139,7 +139,7 @@ Fouque, J.-P., & Han, C.-H. (2004). Variance reduction for Monte Carlo methods t
 
 Bernard, C., & Cui, Z. (2014). Prices and asymptotics for discrete variance swaps. Applied Mathematical Finance, 21(2), 140–173. https://doi.org/10.1080/1350486X.2013.820524
 
-## Publishing a Python Package to PyPI
+## Link to this Published Package to PyPI
 https://pypi.org/project/heston-mc-variance-project/
 
 ## License
